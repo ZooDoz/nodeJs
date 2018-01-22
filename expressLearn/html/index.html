@@ -1,0 +1,56 @@
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Sample Page</title>
+    <script>
+        //获取cookie
+        function getCookie(name) 
+        { 
+            var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
+            if(arr=document.cookie.match(reg))
+                return unescape(arr[2]); 
+            else 
+                return null; 
+        }
+    </script>
+    <script>
+        // var host = getCookie('host');
+        // var port = getCookie('port');
+        // var query = "sessionId="+getCookie('sessionId');
+        var host = '127.0.0.1';
+        var port = '8081';
+        var query = location.search;
+        var ws = new WebSocket('ws://' + host + ':' + port + query);
+        ws.onopen = function (e)
+        {
+            console.log('连接打开了');
+        }
+
+        ws.onclose = function () {
+            console.log("连接关闭了")
+        }
+        
+        ws.onmessage = function (e) {
+           document.getElementById("show").innerHTML += "消息：" + e.data + "<br>"
+           console.log("接受到返回值");
+        }
+        ws.onerror = function () {
+            console.log("连接出错");
+        }
+
+        function sendMessage() {
+            console.log(document.getElementById("send").value);
+            ws.send(document.getElementById("send").value);
+            document.getElementById("send").value = "";
+        }
+    </script>
+</head>
+
+<body>
+    <input id="send"/>
+    <button type="button" onclick="sendMessage();"> Send! </button>
+    <div id="show"> </div>
+</body>
+
+</html>
