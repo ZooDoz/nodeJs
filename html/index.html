@@ -4,8 +4,20 @@
     <meta charset="utf-8" />
     <title>Sample Page</title>
     <script>
-        var ws = new WebSocket("ws://localhost:8181");
-        ws.onopen = function (e) {
+        //获取cookie
+        function getCookie(name) 
+        { 
+            var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
+            if(arr=document.cookie.match(reg))
+                return unescape(arr[2]); 
+            else 
+                return null; 
+        }
+    </script>
+    <script>
+        var ws = new WebSocket("ws://localhost:8181?sessionId=" + getCookie('sessionId'));
+        ws.onopen = function (e)
+        {
             console.log('连接打开了');
         }
 
