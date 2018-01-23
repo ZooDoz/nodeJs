@@ -1,16 +1,10 @@
 var WebSocketServer = require('ws').Server;
-var express = require('express');
 var path = require('path');
 var querystring = require('querystring');
 var http = require('http');
 
-var server = http.createServer();
-
-var app = express();
-app.use(express.static(path.join(__dirname, '/html')));
-
 var wss = new WebSocketServer({
-  server: server,
+  port: 8181,
   clientTracking: false,
   // 这是一个在创建ws时校验方法
   // verifyClient:(info , cb) =>{
@@ -22,9 +16,26 @@ wss.cm = {};
 wss.on('connection', function (ws , req) {
 
   var cookies = querystring.parse(req.headers.cookie , null , null , null);
-  console.log(cookies.sessionId);
 
-  ws.terminate();
+  http.get('http://127.0.0.1:8081/hasUser/' + cookies.sessionId, function (res) {
+    var result = "";
+    res.on('data' , function(data){
+      result+=data;
+    });
+    res.on('end' , function(){
+      if(!result)
+      {
+        var redirect = {};
+        redirect.url = 'http://127.0.0.1:8081/login';
+        ws.send(JSON.stringify(redirect));
+        ws.terminate();
+      }
+      else
+      {
+        wss[cookies.sessionId]=ws;
+      }
+    });
+  });
 
   ws.on('message' , function (d,f) {});
   ws.on('close', function (ws) {
@@ -33,7 +44,4 @@ wss.on('connection', function (ws , req) {
   ws.on('error' , function(err){});
 });
 
-server.on('request', app);
-server.listen(8081, function () {
-  console.log('Listening on http://localhost:8081');
-});
+console.log('Listening on http://localhost:8181');

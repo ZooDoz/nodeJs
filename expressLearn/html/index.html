@@ -13,15 +13,42 @@
             else 
                 return null; 
         }
+        //设置cookie
+        function setCookie(name, value, last)
+        {
+            var exp = new Date();
+            exp.setTime(exp.getTime() + last * 1000);
+            document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString();
+        }
+
+       function saveParametersToCookie (url) {
+            if (url) {
+                if (url.indexOf('?') >= 0) {
+                    var arrUrlParts = url.split('?');
+                    var urlParameters = arrUrlParts[1].split('&');
+                    for (var i = 0; i < urlParameters.length; i++) {
+                        var nameValue = urlParameters[i].split('=');
+                        setCookie(nameValue[0], nameValue[1], 3600);
+                    };
+                }
+            };
+        };
     </script>
     <script>
         // var host = getCookie('host');
         // var port = getCookie('port');
         // var query = "sessionId="+getCookie('sessionId');
+        saveParametersToCookie(location.href);
+     
+        var url = location.href;
+        url = url.split('?')[0];
+        window.history.replaceState({}, 0, url);
+
+
         var host = '127.0.0.1';
-        var port = '8081';
-        var query = location.search;
-        var ws = new WebSocket('ws://' + host + ':' + port + query);
+        var port = '8181';
+        
+        var ws = new WebSocket('ws://' + host + ':' + port);
         ws.onopen = function (e)
         {
             console.log('连接打开了');
@@ -34,6 +61,9 @@
         ws.onmessage = function (e) {
            document.getElementById("show").innerHTML += "消息：" + e.data + "<br>"
            console.log("接受到返回值");
+           console.log(JSON.parse(e.data).url);
+           if(JSON.parse(e.data).url)
+            window.location.href=JSON.parse(e.data).url;
         }
         ws.onerror = function () {
             console.log("连接出错");
