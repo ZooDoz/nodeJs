@@ -3,10 +3,12 @@ var path = require('path');
 
 
 var app = express();
+
+app.use(express.static(path.join("static","html")));
 app.use(express.static('static'));
 
 app.get('/:path', function (req, res) {
-        res.redirect("html/" + req.params.path + '.html');
+        res.redirect(req.params.path + '.html');
 });
 
 app.listen(8081);
