@@ -6,6 +6,7 @@ var uuid = require('uuid');
 var app = express();
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }))
+//设置静态资源
 app.use(express.static(path.join(__dirname, 'html')));
 
 users={};
